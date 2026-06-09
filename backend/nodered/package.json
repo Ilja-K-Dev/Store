@@ -1,0 +1,6 @@
+{
+	"name": "node-red-project",
+	"dependencies": {
+		"node-red-contrib-kafkajs": "*"
+	}
+}
