@@ -5,12 +5,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.project.product_service.application.command.CreateProductCommand;
 import com.project.product_service.domain.aggregate.Product;
+import com.project.product_service.domain.event.ProductCreatedEvent;
 import com.project.product_service.domain.exception.CategoryNotFoundException;
 import com.project.product_service.domain.exception.ProductAlreadyExistsException;
 import com.project.product_service.domain.repository.CategoryRepository;
 import com.project.product_service.domain.repository.OutboxRepository;
 import com.project.product_service.domain.repository.ProductRepository;
-import com.project.shared.event.ProductCreatedEvent;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +35,7 @@ public class CreateProductCommandHandler {
         Product product = Product.create(cmd.displayName(), cmd.volumeInMl(), cmd.weightInGram(), cmd.categoryId());
         productRepository.save(product);
 
-        ProductCreatedEvent event = ProductCreatedEvent.from(product.getId());
+        ProductCreatedEvent event = ProductCreatedEvent.from(product.getId(), product.getProductName().value());
         outboxRepository.save(event);
     }
 }

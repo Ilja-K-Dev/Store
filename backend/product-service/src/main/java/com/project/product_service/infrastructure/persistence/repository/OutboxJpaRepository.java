@@ -26,5 +26,5 @@ public interface OutboxJpaRepository extends JpaRepository<OutboxEventEntity, UU
     @Modifying
     @Transactional
     @Query("UPDATE OutboxEventEntity e SET e.published = true WHERE e.id = :id")
-    void markAsProcessed(UUID id);
+    void markAsProcessed(@Param("id") UUID id);
 }

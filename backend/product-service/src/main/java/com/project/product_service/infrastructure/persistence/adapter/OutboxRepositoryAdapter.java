@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.shared.event.ProductCreatedEvent;
+import com.project.product_service.domain.event.ProductCreatedEvent;
 import com.project.product_service.domain.repository.OutboxRepository;
-import com.project.product_service.domain.shared.enums.EventType;
+import com.project.product_service.domain.event.EventType;
 import com.project.product_service.infrastructure.exception.OutboxSerializationException;
 import com.project.product_service.infrastructure.persistence.entity.OutboxEventEntity;
 import com.project.product_service.infrastructure.persistence.repository.OutboxJpaRepository;

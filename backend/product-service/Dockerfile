@@ -7,24 +7,18 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY product-service/build.gradle.kts .
-COPY settings.gradle.kts .
-COPY gradle gradle
-COPY gradlew .
-
-COPY product-service product-service
-COPY shared-kernel shared-kernel
+COPY . .
 
 RUN chmod +x gradlew
 
-RUN ./gradlew :product-service:build -x test
+RUN ./gradlew build -x test
 
 # RUNTIME
 FROM eclipse-temurin:21-jdk
 
 WORKDIR /app
 
-COPY --from=build /app/product-service/build/libs/*.jar app.jar
+COPY --from=build /app/build/libs/*.jar app.jar
 
 EXPOSE 8082
 
