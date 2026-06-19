@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+/* =========================================================
+   REMOVE KEYCLOAK WHITE LAYERS (CRITICAL)
+========================================================= */
+
+body.login-pf,
+.login-pf-page,
+.pf-c-page,
+.pf-c-login,
+.pf-c-page__main,
+.card-pf,
+.container,
+.container-fluid {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Hide default header ("Keycloak we are sorry") */
+#kc-header,
+#kc-header-wrapper,
+.login-pf-page-header {
+    display: none !important;
+}
+
+/* =========================================================
+   BACKGROUND (STABLE METHOD - ALWAYS VISIBLE)
+========================================================= */
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+
+    background:
+        linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.65)),
+        url("../img/background.jpg") center/cover no-repeat;
+
+    pointer-events: none;
+}
+
+/* =========================================================
+   CENTER WRAPPER
+========================================================= */
+
+.kc-wrapper {
+    height: 100vh;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+}
+
+/* =========================================================
+   GLASS CARD
+========================================================= */
+
+.kc-card {
+    width: 100%;
+    max-width: 420px;
+
+    padding: 42px;
+
+    border-radius: 28px;
+
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+
+    position: relative;
+    overflow: hidden;
+}
+
+/* subtle shine */
+.kc-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(135deg,
+            rgba(255,255,255,0.14),
+            transparent 45%
+        );
+
+    pointer-events: none;
+}
+
+/* =========================================================
+   HEADER TEXT
+========================================================= */
+
+.kc-header {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.kc-header h1 {
+    margin: 0;
+    font-size: 32px;
+    color: white;
+}
+
+.kc-header p {
+    margin-top: 8px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+}
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.kc-field {
+    margin-bottom: 16px;
+}
+
+.kc-field label {
+    display: block;
+    margin-bottom: 6px;
+
+    font-size: 13px;
+    color: white;
+}
+
+.kc-input {
+    width: 100%;
+    height: 52px;
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+
+    color: white;
+    padding: 0 14px;
+
+    outline: none;
+
+    transition: 0.2s ease;
+}
+
+.kc-input::placeholder {
+    color: rgba(255,255,255,0.45);
+}
+
+.kc-input:focus {
+    border-color: rgba(124,58,237,0.8);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.25);
+    background: rgba(255,255,255,0.10);
+}
+
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.kc-button {
+    width: 100%;
+    height: 52px;
+
+    margin-top: 10px;
+
+    border: none;
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+    color: white;
+
+    background: linear-gradient(135deg, #7c3aed, #06b6d4);
+
+    transition: 0.2s ease;
+}
+
+.kc-button:hover {
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+    .kc-card {
+        padding: 26px;
+        border-radius: 22px;
+    }
+
+    .kc-header h1 {
+        font-size: 26px;
+    }
+}

@@ -1,0 +1,84 @@
+############################
+# Node.js / Angular
+############################
+
+node_modules/
+.angular/
+dist/
+out-tsc/
+
+############################
+# Spring Boot / Gradle
+############################
+
+.gradle/
+build/
+out/
+bin/
+
+*.class
+*.log
+
+############################
+# NodeRED
+############################
+
+nodered/.npm
+nodered/*.backup
+nodered/backup
+nodered/.config.nodes.json
+nodered/.config.runtime.json
+nodered/.config.users.json
+
+############################
+# pnpm
+############################
+
+.pnpm-store/
+pnpm-debug.log*
+
+############################
+# Environment Files
+############################
+
+.env
+.env.*
+!.env.example
+
+############################
+# Vitest
+############################
+
+coverage/
+.vitest/
+
+junit.xml
+test-results/
+
+############################
+# IDEs
+############################
+
+.idea/
+*.iml
+
+.vscode/
+
+.project
+.classpath
+.settings/
+
+############################
+# Operating System
+############################
+
+.DS_Store
+Thumbs.db
+
+############################
+# Temporary Files
+############################
+
+tmp/
+temp/
+*.tmp

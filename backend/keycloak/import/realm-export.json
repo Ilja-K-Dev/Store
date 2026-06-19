@@ -1,0 +1,65 @@
+{
+  "realm": "store-realm",
+  "enabled": true,
+  "loginTheme": "mytheme",
+
+  "clients": [
+    {
+      "clientId": "store-frontend",
+      "enabled": true,
+      "publicClient": true,
+      "redirectUris": ["http://localhost:4200/*"],
+      "webOrigins": ["http://localhost:4200"],
+      "protocol": "openid-connect"
+    }
+  ],
+
+  "roles": {
+    "realm": [
+      {
+        "name": "VIEW_ORDERS"
+      },
+      {
+        "name": "ASSIGN_ORDER"
+      },
+      {
+        "name": "CHANGE_ORDER_STATUS"
+      },
+      {
+        "name": "MANAGE_EXPIRY"
+      },
+      {
+        "name": "VIEW_STOCK"
+      },
+      {
+        "name": "REPLENISH_STOCK"
+      },
+      {
+        "name": "VIEW_STATISTICS"
+      }
+    ]
+  },
+
+  "users": [
+    {
+      "username": "marktleitung",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "VIEW_ORDERS",
+        "ASSIGN_ORDER",
+        "CHANGE_ORDER_STATUS",
+        "MANAGE_EXPIRY",
+        "VIEW_STOCK",
+        "REPLENISH_STOCK",
+        "VIEW_STATISTICS"
+      ]
+    }
+  ]
+}

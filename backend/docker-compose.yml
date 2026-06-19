@@ -1,0 +1,246 @@
+services:  
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: postgres
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - backend
+
+  kafka-1:
+    image: apache/kafka:4.0.0
+    container_name: kafka-1
+    restart: unless-stopped
+
+    ports:
+      - "9092:9092"
+
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_CLUSTER_ID: bcaffa32-f873-4713-bbea-fca2803359c4
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: >
+        1@kafka-1:9093,
+        2@kafka-2:9093,
+        3@kafka-3:9093
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+
+    volumes:
+      - kafka_1_data:/var/lib/kafka/data
+
+    networks:
+      - backend
+
+  kafka-2:
+    image: apache/kafka:4.0.0
+    container_name: kafka-2
+    restart: unless-stopped
+
+    ports:
+      - "9094:9092"
+
+    environment:
+      KAFKA_NODE_ID: 2
+      KAFKA_CLUSTER_ID: bcaffa32-f873-4713-bbea-fca2803359c4
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: >
+        1@kafka-1:9093,
+        2@kafka-2:9093,
+        3@kafka-3:9093
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+
+    volumes:
+      - kafka_2_data:/var/lib/kafka/data
+
+    networks:
+      - backend
+
+  kafka-3:
+    image: apache/kafka:4.0.0
+    container_name: kafka-3
+    restart: unless-stopped
+
+    ports:
+      - "9095:9092"
+
+    environment:
+      KAFKA_NODE_ID: 3
+      KAFKA_CLUSTER_ID: bcaffa32-f873-4713-bbea-fca2803359c4
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-3:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: >
+        1@kafka-1:9093,
+        2@kafka-2:9093,
+        3@kafka-3:9093
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+
+    volumes:
+      - kafka_3_data:/var/lib/kafka/data
+
+    networks:
+      - backend
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: unless-stopped
+
+    ports:
+      - "8085:8080"
+
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local-cluster
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+    networks:
+      - backend
+
+  nodered:
+    image: nodered/node-red:latest
+    container_name: nodered
+    restart: unless-stopped
+
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+    ports:
+      - "1880:1880"
+
+    volumes:
+      - ./nodered:/data
+
+    networks:
+      - backend
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.2
+    container_name: keycloak
+
+    command:
+      - start-dev
+      - --http-port=8080
+      - --import-realm
+      - --spi-theme-static-max-age=-1
+      - --spi-theme-cache-themes=false
+      - --spi-theme-cache-templates=false
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+
+      KC_DB: postgres
+      KC_DB_URL: ${KC_DB_URL}
+      KC_DB_USERNAME: ${DB_USERNAME}
+      KC_DB_PASSWORD: ${DB_PASSWORD}
+
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+
+      KC_PROXY: edge
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    volumes:
+      - ./keycloak/themes:/opt/keycloak/themes
+      - ./keycloak/import:/opt/keycloak/data/import
+
+    networks:
+      - backend
+
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    container_name: product-service
+
+    restart: unless-stopped
+
+    ports:
+      - "8082:8082"
+
+    environment:
+      SPRING_DATASOURCE_URL: ${PRD_DB_URL}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka-1:9092,kafka-2:9092,kafka-3:9092
+
+    healthcheck:
+      test: ["CMD-SHELL","wget --spider http://localhost:8082/actuator/health || exit 1"]
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka-1:
+        condition: service_started
+      kafka-2:
+        condition: service_started
+      kafka-3:
+        condition: service_started
+
+    networks:
+      - backend
+
+volumes:
+  postgres_data:
+  kafka_1_data:
+  kafka_2_data:
+  kafka_3_data:
+
+networks:
+  backend:
